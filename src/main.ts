@@ -10,7 +10,7 @@ import { GROWTH_VIEW_TYPE } from "./constants";
 import { RightSideBarView } from "./views/right-side-bar-view";
 import { FileAggregator } from "./aggregators/file-aggregator";
 import { TagFilter } from "./aggregators/filters/tag-filter";
-import { TransactionAggregator } from "./aggregators/transactions-aggregator";
+import { TransactionAggregator, type Transaction } from "./aggregators/transactions-aggregator";
 import { NewLineSeparatedTransactionParser } from "./aggregators/parsers/transaction-parser";
 
 // Remember to rename these classes and interfaces!
@@ -25,6 +25,7 @@ const DEFAULT_SETTINGS: GrowthPluginSettings = {
 
 export default class GrowthPlugin extends Plugin {
 	settings: GrowthPluginSettings | undefined;
+	transactions: Transaction[] | undefined;
 
 	async onload() {
 		await this.loadSettings();
@@ -39,6 +40,9 @@ export default class GrowthPlugin extends Plugin {
 			txnParser,
 		);
 
+		const files = await fileAggregator.aggregateFiles();
+		this.transactions = await txnAggregator.aggregate(files);
+
 		this.registerView(
 			GROWTH_VIEW_TYPE,
 			(leaf) => new RightSideBarView(leaf),
@@ -47,10 +51,9 @@ export default class GrowthPlugin extends Plugin {
 		// This creates an icon in the left ribbon.
 		this.addRibbonIcon("sprout", "Growth!", async (evt: MouseEvent) => {
 			const { workspace } = this.app;
-			const files = await fileAggregator.aggregateFiles();
-			const transactions = await txnAggregator.aggregate(files);
+
 			// TODO: Remove console log that prints each file path
-			transactions.forEach((txn) => console.log(txn));
+			this.transactions && this.transactions.forEach((txn) => console.log(txn));
 
 			let leaf: WorkspaceLeaf | null = null;
 			const leaves = workspace.getLeavesOfType(GROWTH_VIEW_TYPE);
@@ -78,6 +81,7 @@ export default class GrowthPlugin extends Plugin {
 
 	onunload() {
 		console.log("Unloading growth plugin...");
+		if (this.transactions) this.transactions.length = 0
 	}
 
 	async loadSettings() {
