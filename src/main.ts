@@ -8,6 +8,7 @@ import {
 } from "obsidian";
 import { GROWTH_VIEW_TYPE } from "./constants";
 import { RightSideBarView } from "./views/right-side-bar-view";
+import { FileAggregator } from "./aggregators/file-aggragator";
 import { TagFilter } from "./aggregators/filters/tag-filter";
 
 // Remember to rename these classes and interfaces!
@@ -121,11 +122,11 @@ class SampleSettingTab extends PluginSettingTab {
 					.setPlaceholder("Enter your secret")
 					.setValue(this.plugin.settings?.mySetting || "")
 					.onChange(async (value) => {
-						if (this.plugin.settings){
+						if (this.plugin.settings) {
 							this.plugin.settings.mySetting = value;
 							await this.plugin.saveSettings();
 						}
 					}),
-			);	
+			);
 	}
 }
