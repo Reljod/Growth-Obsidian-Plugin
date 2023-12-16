@@ -8,8 +8,10 @@ import {
 } from "obsidian";
 import { GROWTH_VIEW_TYPE } from "./constants";
 import { RightSideBarView } from "./views/right-side-bar-view";
-import { FileAggregator } from "./aggregators/file-aggragator";
+import { FileAggregator } from "./aggregators/file-aggregator";
 import { TagFilter } from "./aggregators/filters/tag-filter";
+import { TransactionAggregator } from "./aggregators/transactions-aggregator";
+import { NewLineSeparatedTransactionParser } from "./aggregators/parsers/transaction-parser";
 
 // Remember to rename these classes and interfaces!
 
@@ -31,6 +33,11 @@ export default class GrowthPlugin extends Plugin {
 
 		const tagFilter = new TagFilter(this.app.vault);
 		const fileAggregator = new FileAggregator(this.app.vault, [tagFilter]);
+		const txnParser = new NewLineSeparatedTransactionParser();
+		const txnAggregator = new TransactionAggregator(
+			this.app.vault,
+			txnParser,
+		);
 
 		this.registerView(
 			GROWTH_VIEW_TYPE,
@@ -41,8 +48,9 @@ export default class GrowthPlugin extends Plugin {
 		this.addRibbonIcon("sprout", "Growth!", async (evt: MouseEvent) => {
 			const { workspace } = this.app;
 			const files = await fileAggregator.aggregateFiles();
+			const transactions = await txnAggregator.aggregate(files);
 			// TODO: Remove console log that prints each file path
-			files.forEach((file) => console.log(file.path));
+			transactions.forEach((txn) => console.log(txn));
 
 			let leaf: WorkspaceLeaf | null = null;
 			const leaves = workspace.getLeavesOfType(GROWTH_VIEW_TYPE);
