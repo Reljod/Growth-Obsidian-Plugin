@@ -8,7 +8,7 @@ import {
 } from "obsidian";
 import { GROWTH_VIEW_TYPE } from "./constants";
 import { RightSideBarView } from "./views/right-side-bar-view";
-import { FileAggregator } from "./aggregators/file-aggragator";
+import { FileAggregator } from "./aggregators/file-aggregator";
 import { TagFilter } from "./aggregators/filters/tag-filter";
 
 // Remember to rename these classes and interfaces!
