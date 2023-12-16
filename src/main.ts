@@ -8,6 +8,7 @@ import {
 } from "obsidian";
 import { GROWTH_VIEW_TYPE } from "./constants";
 import { RightSideBarView } from "./views/right-side-bar-view";
+import { TagFilter } from "./aggregators/filters/tag-filter";
 
 // Remember to rename these classes and interfaces!
 
@@ -27,6 +28,9 @@ export default class GrowthPlugin extends Plugin {
 
 		console.log("Loading growth plugin");
 
+		const tagFilter = new TagFilter(this.app.vault);
+		const fileAggregator = new FileAggregator(this.app.vault, [tagFilter]);
+
 		this.registerView(
 			GROWTH_VIEW_TYPE,
 			(leaf) => new RightSideBarView(leaf),
@@ -35,6 +39,9 @@ export default class GrowthPlugin extends Plugin {
 		// This creates an icon in the left ribbon.
 		this.addRibbonIcon("sprout", "Growth!", async (evt: MouseEvent) => {
 			const { workspace } = this.app;
+			const files = await fileAggregator.aggregateFiles();
+			// TODO: Remove console log that prints each file path
+			files.forEach((file) => console.log(file.path));
 
 			let leaf: WorkspaceLeaf | null = null;
 			const leaves = workspace.getLeavesOfType(GROWTH_VIEW_TYPE);
