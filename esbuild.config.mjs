@@ -42,7 +42,7 @@ const context = await esbuild.context({
 	outfile: "main.js",
 	plugins: [
 		esbuildSvelte({
-			compilerOptions: { css: 'injected' },
+			compilerOptions: { css: "injected" },
 			preprocess: sveltePreprocess(),
 		}),
 	],
